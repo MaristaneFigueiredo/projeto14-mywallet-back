@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import joi from "joi";
 import { MongoClient } from "mongodb";
 import bcrypt from "bcrypt"; //bcrypt - biblioteca do javascript para encriptar qualquer tipo de dado
+import {v4 as uuid} from "uuid" // versão 4 é que gera string
 
 // Modelo desejados para valores
 const userSchema = joi.object({
@@ -28,6 +29,8 @@ try {
 
 const db = mongoClient.db("myWallet");
 const userCollection = db.collection("users");
+const sessionCollection = db.collection("sessions"); 
+const recordCollection = db.collection("records")
 
 // Rotas
 //POST SIGN-UP
@@ -69,6 +72,8 @@ app.post("/sign-in", async (req, res) => {
 
   try {
     const userExists = await userCollection.findOne({ email });
+   
+
     if (!userExists) {
       return res.status(401).send({ message: "Usuário não autorizado!" });
     }
@@ -78,12 +83,87 @@ app.post("/sign-in", async (req, res) => {
       return res.sendStatus(401);
     }
 
-    res.send({ message: `Olá ${userExists.name}, seja bem vindo(a)!` });
+    //gerando token (é uma string de um número aleatório único)
+    const token = uuid()
+    console.log(token)
+    // sessão - uma janela de tempo q o usuário está logado no dispositivo 
+    await sessionCollection.insertOne({
+      userId: user._id,
+      token
+    })
+
+    res.send(token);
+    //res.send({ message: `Olá ${userExists.name}, seja bem vindo(a)!` });
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error });
   }
 });
 
+// POST Records entrada
+app.post("/records-entry", async (req, res) => {
+
+  try {
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({message: error})
+  }
+
+})
+// POST Records exit
+app.post("/records-exit", async (req, res) => {
+
+  try {
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({message: error})
+  }
+
+})
+
+// GET Records 
+app.get("/records", async (req, res) => {
+ 
+  const {authorization} = req.headers // Formato do "Bearer Token" - O token chegará pela requisição. O "Bearer" não é importante no back-end, é só um padrão de mercado  
+
+  // Eu só qro q tenha acesso a essa rota pessoas logadas. 
+  if (!authorization) {
+    return res.status(401).send({ message: "Usuário não autorizado!" });
+  }
+  try {
+
+    // Preciso verificar se esse usuário é o mesmo que está logado
+    const token = authorization?.replace("Bearer ", "") // o token é só uma string, não preciso do "Bearer " que vem na requisição
+          // obs.: uma interrogação(opcional change) faz com qualquer variável seja opcional
+    console.log(token)
+
+    const session = await sessionCollection.findOne({token})
+    console.log(session.userID)
+    const user = await userCollection.findOne({_id: session?.userID})
+    if (!user) {
+      return res.sendStatus(401)
+    }
+
+    const records = await recordCollection.find({ email: user.email })
+
+    // como uma camada a mais de segurança não retornar o password do usuário
+    delete user.password
+
+    res.send(records, user)
+
+  } catch (error) {
+    console.log(error)
+    return res.status(500).send({message: error})
+  }
+
+})
+
+
+
+
 //Definição da porta
 app.listen(5000, () => console.log("Server running in port 5000"));
+
+//42 minutos
