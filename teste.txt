@@ -5,7 +5,7 @@ http://localhost:5000/sign-up
   "password": "12345678"
 }
 
-http://localhost:5000/sign-up
+http://localhost:5000//sign-in
 {
   "email": "teste@gmail.com",
   "password": "12345678"
