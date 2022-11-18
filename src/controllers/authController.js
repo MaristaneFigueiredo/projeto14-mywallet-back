@@ -8,14 +8,14 @@ export async function postSignUp(req, res) {
   try {
     const userExists = await userCollection.findOne({ email: user.email });
     if (userExists) {
-      return res.status(409).send({ message: "Este email já existe!" });
+      return res.status(409).send({ message: "Este email já existe!" });      
       //409: Conflict => Significa que o recurso que você está tentando inserir já foi inserido
     }
 
     //criptografar a senha
-    const hashPassword = bcrypt.hashSync(user.password, 10); // fará um hash de forma síncrona - é necessário passar dois parâmetros: Dado e buffer(rodas de saltos de criptografia - cria um hash elevado a potência de vezes)
+    const hashPassword = bcrypt.hashSync(user.password, 10); // fará um hash de forma síncrona - é necessário passar dois parâmetros: Dado e buffer(cria um hash elevado a potência de vezes)
 
-    //await userCollection.insertOne(user);
+    
     await userCollection.insertOne({ ...user, password: hashPassword });
     res.sendStatus(201);
   } catch (error) {
@@ -38,17 +38,18 @@ export async function postSignIn(req, res) {
 
     const passwordOk = bcrypt.compareSync(password, userExists.password); // dois parâmetros: O dado que qro validar / dado encriptado
 
-    if (!passwordOk) {
-      return res.sendStatus(401);
+    if (!passwordOk) {     
+      return res.status(401).send({ message: "Senha incorreta!" });
     }
 
     //gerando token (chave - é uma string de um número aleatório único)
     const token = uuidV4();
-    console.log("token", token);
+    console.log("token 1", token);
 
     const sessionExists = await sessionCollection.findOne({
       userId: userExists._id,
     });
+    console.log('userExists._id',userExists._id)
 
     if (sessionExists) {
       return res.status(401).send({ message: "Usuário já logado!" });
@@ -60,7 +61,7 @@ export async function postSignIn(req, res) {
       token,
     });
 
-    res.send({ token }); // é uma excelente prática retornar de qualquer sign-in apenas o token
+    res.send(token); // é uma excelente prática retornar de qualquer sign-in apenas o token
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error });
