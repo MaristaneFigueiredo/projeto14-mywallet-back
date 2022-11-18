@@ -7,4 +7,4 @@ const authRouter = Router();
 authRouter.post("/sign-up", userSchemaMiddleware, postSignUp);
 authRouter.post("/sign-in", emailValidationMiddleware, postSignIn);
 
-export default authRouter;
+export default authRouter; // é um objeto de rotas q o express gerenciará. 

@@ -1,5 +1,5 @@
 
-import { recordCollection, userCollection, sessionCollection } from "../db.js";
+import { recordCollection, userCollection, sessionCollection } from "../database/db.js";
 
 export async function postRecordsEntry(req, res) {
   const record = req.body;

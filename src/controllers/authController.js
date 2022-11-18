@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt"; //bcrypt - biblioteca do javascript para encriptar qualquer tipo de dado
 import { v4 as uuidV4 } from "uuid"; // versão 4 é que gera string
-import { userCollection, sessionCollection } from "../db.js";
+import { userCollection, sessionCollection } from "../database/db.js";
 
 export async function postSignUp(req, res) {
   const user = req.body;
