@@ -57,6 +57,9 @@ export async function postRecordsExit(req, res) {
   }
 }
 
+
+let valueEntry = 0
+let valueExit = 0
 export async function getRecords(req, res) {
   const { authorization } = req.headers; // Formato do "Bearer Token" - O token chegará pela requisição. O "Bearer" não é importante no back-end, é só um padrão de mercado
   
@@ -78,13 +81,27 @@ export async function getRecords(req, res) {
 
     const records = await recordCollection.find({ userId: session?.userId }).toArray();
 
+
+
+    //saldo a respeito dos valores de entrada e saída
+    records.forEach(calculetSaldo)
+    let saldo = (valueEntry -  valueExit).toFixed(2)
+    
     // não é uma boa prática e tbm é uma camada a mais de segurança,  não é legal retornar o password do usuário no objeto de usuário
     delete user.password;
 
-    res.send({records, user});    
+    res.send({records, user, saldo});    
 
   } catch (error) {
     console.log(error);
     return res.status(500).send({ message: error });
+  }
+}
+
+function calculetSaldo(item) {
+  if (item.typeRecord === "E" ) {       
+    valueEntry += Number(item.value)
+  } else {
+    valueExit += Number(item.value)     
   }
 }
