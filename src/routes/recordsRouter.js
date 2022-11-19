@@ -5,7 +5,7 @@ import {
   getRecords,
 } from "../controllers/recordsController.js";
 import recordSchemaMiddleware from "../middleswares/recordSchemaMiddleware.js";
-import authorizationValidationMiddleware from "../middleswares/authorizationValidationMiddleware.js";
+import tokenValidation from "../middleswares/tokenValidationMiddleware.js";
 
 const recordsRouter = Router();
 
@@ -13,7 +13,7 @@ const recordsRouter = Router();
 recordsRouter.post(
   "/records-entry",
   recordSchemaMiddleware,
-  authorizationValidationMiddleware,
+  tokenValidation,
   postRecordsEntry
 );
 
@@ -21,11 +21,11 @@ recordsRouter.post(
 recordsRouter.post(
   "/records-exit",
   recordSchemaMiddleware,
-  authorizationValidationMiddleware,
+  tokenValidation,
   postRecordsExit
 );
 
 // GET Records
-recordsRouter.get("/records", authorizationValidationMiddleware, getRecords);
+recordsRouter.get("/records", tokenValidation, getRecords);
 
 export default recordsRouter;

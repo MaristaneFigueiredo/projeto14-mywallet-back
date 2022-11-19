@@ -7,7 +7,7 @@ export default function validationRecordSchema(req, res, next) {
   const { error } = recordSchema.validate(record, { abortEarly: false });
   if (error) {
     const errors = error.details.map((d) => d.message);
-    return res.status(422).send({message: errors});
+    return res.status(422).send({ message: errors });
     //422: Unprocessable Entity => Significa que a requisição enviada não está no formato esperado
   }
 
