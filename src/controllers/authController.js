@@ -40,9 +40,9 @@ export async function logout(req, res) {
   try {
     const user = res.locals.user;
 
-    console.log("user", user);
+    //console.log("user", user);
 
-    //await sessionCollection.deleteOne({ userId: user._id });
+    await sessionCollection.deleteOne({ userId: user._id });
     return res.status(200).send({ message: "ok!" });
   } catch (error) {
     console.log(error);
